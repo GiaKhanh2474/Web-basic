@@ -43,7 +43,7 @@ function url(string $path = ''): string
     if ($documentRoot !== '' && str_starts_with(strtolower($root . '/'), strtolower($documentRoot . '/'))) {
         $base = substr($root, strlen($documentRoot));
     } else {
-        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/cellphones-shop/laptop.php');
+        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/cellphones-shop/monitor.php');
         $base = preg_replace('~/(?:api/)?[^/]+\.php$~', '', $script) ?: '';
     }
     return rtrim($base, '/') . '/' . ltrim($path, '/');

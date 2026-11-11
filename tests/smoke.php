@@ -105,12 +105,12 @@ try {
     $pdo->prepare($sql)->execute(array_values($source));
     $temporaryId = (int)$pdo->lastInsertId();
 
-    $home = request('laptop.php', $cookies);
+    $home = request('monitor.php', $cookies);
     check($home['status'] === 200, 'Catalog responds successfully');
     $token = token_from($home['body']);
     check(strlen($token) >= 32, 'Page provides a session CSRF token');
 
-    $search = request('laptop.php?q=' . rawurlencode('QA ' . $suffix), $cookies);
+    $search = request('monitor.php?q=' . rawurlencode('QA ' . $suffix), $cookies);
     check($search['status'] === 200 && str_contains($search['body'], $source['slug']), 'A product inserted into MySQL appears in catalog search');
     check(!str_contains($search['body'], $testName), 'Database product names cannot inject raw HTML into catalog');
 
@@ -119,7 +119,7 @@ try {
     check(!str_contains($detail['body'], $testName), 'Database product names cannot inject raw HTML into detail page');
 
     $xssQuery = '<script>alert("qa")</script>';
-    $escapedSearch = request('laptop.php?q=' . rawurlencode($xssQuery), $cookies);
+    $escapedSearch = request('monitor.php?q=' . rawurlencode($xssQuery), $cookies);
     check($escapedSearch['status'] === 200 && !str_contains($escapedSearch['body'], $xssQuery), 'Search input is escaped');
     $missing = request('product.php?slug=qa-missing-' . $suffix, $cookies);
     check($missing['status'] === 404, 'Unknown product returns HTTP 404');
@@ -155,7 +155,7 @@ try {
     $tamperedPrice = mutate($cookies, $token, 'update', $temporaryId, 2, ['price' => 1, 'total' => 2]);
     check($tamperedPrice['status'] === 200 && (int)($tamperedPrice['json']['total'] ?? -1) === 2469134, 'Client-supplied price and total cannot override MySQL pricing');
 
-    $otherHome = request('laptop.php', $otherCookies);
+    $otherHome = request('monitor.php', $otherCookies);
     $otherToken = token_from($otherHome['body']);
     $isolated = mutate($otherCookies, $otherToken, 'add', $temporaryId);
     check($isolated['status'] === 200 && (int)($isolated['json']['count'] ?? -1) === 1, 'Different sessions have independent carts');

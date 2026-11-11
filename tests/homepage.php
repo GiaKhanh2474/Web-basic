@@ -111,11 +111,11 @@ try {
     $csrf = $xpath->evaluate('string(//meta[@name="csrf-token"]/@content)');
     home_check(is_string($csrf) && $csrf !== '', 'Homepage exposes a CSRF token for cart actions');
 
-    $catalog = home_request('laptop.php', $cookies);
+    $catalog = home_request('monitor.php', $cookies);
     $catalogSlugs = home_card_slugs(home_dom($catalog['body']));
     $monitorSlugs = array_column($groups['monitor'], 'slug');
     sort($monitorSlugs);
-    home_check($catalog['status'] === 200 && $catalogSlugs === $monitorSlugs, 'Existing laptop.php catalog still displays monitors only');
+    home_check($catalog['status'] === 200 && $catalogSlugs === $monitorSlugs, 'Existing monitor.php catalog still displays monitors only');
 
     $representatives = [];
     foreach ($groups as $category => $rows) {
@@ -184,10 +184,14 @@ try {
     $cleanupIds = [];
     home_check((int) ($removed['json']['count'] ?? -1) === 0 && (int) ($removed['json']['total'] ?? -1) === 0, 'Test cart is empty after removing all items');
 
-    $before = hash('sha256', json_encode($pdo->query('SELECT * FROM products ORDER BY id')->fetchAll(PDO::FETCH_ASSOC), JSON_THROW_ON_ERROR));
-    setup_homepage($pdo);
-    $after = hash('sha256', json_encode($pdo->query('SELECT * FROM products ORDER BY id')->fetchAll(PDO::FETCH_ASSOC), JSON_THROW_ON_ERROR));
-    home_check(hash_equals($before, $after), 'Re-running homepage setup preserves every existing product field and avoids duplicate products');
+    // Setup intentionally restores missing demo products; do not run it on a customized
+    // catalog as part of ordinary HTTP checks. Opt in only on a disposable test database.
+    if (in_array('--check-migration', $argv, true)) {
+        $before = hash('sha256', json_encode($pdo->query('SELECT * FROM products ORDER BY id')->fetchAll(PDO::FETCH_ASSOC), JSON_THROW_ON_ERROR));
+        setup_homepage($pdo);
+        $after = hash('sha256', json_encode($pdo->query('SELECT * FROM products ORDER BY id')->fetchAll(PDO::FETCH_ASSOC), JSON_THROW_ON_ERROR));
+        home_check(hash_equals($before, $after), 'Re-running homepage setup preserves every existing product field and avoids duplicate products');
+    }
 } catch (Throwable $exception) {
     $failure = $exception;
 } finally {
