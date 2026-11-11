@@ -21,7 +21,25 @@ function products(array $filters = []): array
             $params[] = $filters[$key];
         }
     }
+    // PC filters: match part of the specification text (for example 'Core i5', '16GB', '512GB').
+    foreach (['cpu' => 'cpu', 'gpu' => 'gpu'] as $key => $column) {
+        $value = trim((string) ($filters[$key] ?? ''));
+        if ($value !== '') {
+            $where[] = $column . ' LIKE ?';
+            $params[] = '%' . addcslashes($value, '%_\\') . '%';
+        }
+    }
+    foreach (['ram' => 'ram', 'storage' => 'storage'] as $key => $column) {
+        $value = trim((string) ($filters[$key] ?? ''));
+        if ($value !== '') {
+            $where[] = $column . ' LIKE ?';
+            $params[] = addcslashes($value, '%_\\') . '%';
+        }
+    }
     switch ($filters['price'] ?? '') {
+        case 'under15': $where[] = 'price < 15000000'; break;
+        case '15to25': $where[] = 'price >= 15000000 AND price <= 25000000'; break;
+        case 'over25': $where[] = 'price > 25000000'; break;
         case 'under3': $where[] = 'price < 3000000'; break;
         case '3to5': $where[] = 'price >= 3000000 AND price <= 5000000'; break;
         case 'over5': $where[] = 'price > 5000000'; break;

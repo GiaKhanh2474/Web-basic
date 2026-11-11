@@ -280,3 +280,8 @@ https://cellphones.com.vn/man-hinh-xiaomi-a27qi-2026-27-inch.html
 Đây là phiên bản tái tạo cục bộ phục vụ dự án được yêu cầu, không phải website chính thức của nhà bán lẻ CellphoneS.
 
 Hình ảnh và dữ liệu sản phẩm được sử dụng cho mục đích minh họa và có thể thay thế bằng danh mục sản phẩm riêng của bạn.
+
+
+## Danh mục PC
+
+Trang máy tính để bàn nằm tại `pc.php` và được nối từ menu danh mục. Bộ lọc CPU, RAM, ổ cứng và khoảng giá dùng chung bảng `products`; trang màn hình vẫn dùng `monitor.php`. Dữ liệu cài đặt mới gồm 5 PC từ nhánh NgoHuyBinh và 5 laptop mẫu. Khi nâng cấp database có sẵn, chạy `scripts/setup-homepage.php` để thêm các PC mới mà không xóa sản phẩm đã chỉnh sửa.

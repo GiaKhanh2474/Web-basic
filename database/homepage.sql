@@ -6,21 +6,26 @@ INSERT INTO products
      refresh_rate, response_time, usage_type, cpu, ram, storage, gpu, stock, description,
      featured, rating, review_count)
 VALUES
-    ('pc-dell-optiplex-7010-demo', 'Máy tính Dell OptiPlex 7010', 'Dell', 'pc', 12990000, NULL,
-     'assets/images/home/pc-dell.jpg', 0, '', '', 0, '', 'Văn phòng', 'Intel Core i5', '16GB RAM', 'SSD 512GB', 'Intel UHD', 10,
-     'Sản phẩm mẫu cho trang chủ. Máy tính để bàn dành cho công việc văn phòng, học tập và xử lý tài liệu. Cấu hình và giá là dữ liệu minh họa, có thể chỉnh sửa trực tiếp trong MySQL.', 0, 0, 0),
-    ('pc-hp-pro-tower-400-g9-demo', 'Máy tính HP Pro Tower 400 G9', 'HP', 'pc', 11490000, NULL,
-     'assets/images/home/pc-hp.jpg', 0, '', '', 0, '', 'Văn phòng', 'Intel Core i5', '8GB RAM', 'SSD 512GB', 'Intel UHD', 10,
-     'Sản phẩm mẫu cho trang chủ. Thiết kế máy tính dạng tháp phù hợp bàn làm việc và không gian học tập. Cấu hình và giá là dữ liệu minh họa để bạn thay bằng thông tin thực tế.', 0, 0, 0),
-    ('pc-asus-expertcenter-d500-demo', 'Máy tính ASUS ExpertCenter D500', 'ASUS', 'pc', 13990000, NULL,
-     'assets/images/home/pc-asus.jpg', 0, '', '', 0, '', 'Văn phòng', 'Intel Core i5', '16GB RAM', 'SSD 512GB', 'Intel UHD', 10,
-     'Sản phẩm mẫu cho trang chủ. Máy tính để bàn cho các tác vụ công việc thường ngày. Thông số và giá trong bản demo có thể cập nhật trong bảng products.', 0, 0, 0),
-    ('pc-msi-mag-infinite-s3-demo', 'Máy tính MSI MAG Infinite S3', 'MSI', 'pc', 21990000, NULL,
-     'assets/images/home/pc-msi.jpg', 0, '', '', 0, '', 'Gaming', 'Intel Core i5', '16GB RAM', 'SSD 1TB', 'GeForce RTX 4060', 10,
-     'Sản phẩm mẫu cho trang chủ. Một lựa chọn minh họa dành cho góc gaming và giải trí. Cấu hình và giá không phải báo giá bán hàng trực tiếp; hãy cập nhật theo sản phẩm của bạn.', 0, 0, 0),
-    ('pc-lenovo-legion-t5-demo', 'PC Gaming Lenovo Legion T5', 'Lenovo', 'pc', 16990000, NULL,
-     'assets/images/home/pc-gaming.jpg', 0, '', '', 0, '', 'Gaming', 'AMD Ryzen 5', '16GB RAM', 'SSD 512GB', 'GeForce RTX 3060', 10,
-     'Sản phẩm mẫu cho trang chủ. Cấu hình PC minh họa cho nhu cầu chơi game và làm việc đa nhiệm. Bạn có thể đổi tên, thông số, ảnh, giá và số lượng trực tiếp trong MySQL.', 0, 0, 0),
+    ('pc-cps-gaming-g01-i3-13100f-rx-6500-xt', 'PC CPS Gaming G01 i3 13100F / 8GB / 256GB / RX 6500 XT', 'CPS', 'pc', 11990000, 13990000,
+     'img/pc1_png.webp', 0, '', '', 0, '', 'Gaming', 'Intel Core i3 13100F', '8GB', '256GB SSD', 'AMD Radeon RX 6500 XT', 20,
+     'Bộ máy để bàn gọn gàng với vi xử lý Intel Core i3 13100F, card đồ họa RX 6500 XT, RAM 8GB và ổ lưu trữ 256GB trên bo mạch chủ H610M.
+Cấu hình phù hợp cho học tập, giải trí và các tựa game phổ biến như Liên Minh Huyền Thoại, FIFA Online 4, GTA V, CS:GO. Thùng máy kính cường lực cùng quạt LED mang lại góc máy nổi bật.', 0, 4.8, 36),
+    ('pc-cps-gaming-g02-i3-13100f-rtx-3050', 'PC CPS Gaming G02 i3 13100F / 8GB / 256GB / RTX 3050', 'CPS', 'pc', 13790000, 15990000,
+     'img/pc2_png.webp', 0, '', '', 0, '', 'Gaming', 'Intel Core i3 13100F', '8GB', '256GB SSD', 'NVIDIA GeForce RTX 3050', 25,
+     'Cấu hình gaming gọn nhẹ với Intel Core i3 13100F, card đồ họa GeForce RTX 3050, RAM 8GB, ổ lưu trữ 256GB và bo mạch chủ H610M.
+Phù hợp cho nhu cầu chơi game, học tập và làm việc hằng ngày. Thùng máy kính cường lực với quạt LED giúp góc máy thêm đẹp mắt.', 1, 4.9, 58),
+    ('pc-msi-gaming-i7-12700-rtx-5060', 'PC MSI Gaming i7 12700 / 16GB / 256GB / RTX 5060', 'MSI', 'pc', 27990000, 31990000,
+     'img/pc3_png.webp', 0, '', '', 0, '', 'Gaming', 'Intel Core i7 12700', '16GB', '256GB SSD', 'NVIDIA GeForce RTX 5060', 12,
+     'Bộ PC dùng thùng máy MSI với Intel Core i7 12700, card đồ họa GeForce RTX 5060, RAM 16GB, ổ lưu trữ 256GB và bo mạch chủ B760M.
+Cấu hình mạnh mẽ cho game, đa nhiệm và các phần mềm thiết kế. Quạt RGB phía trước cùng mặt kính trong suốt tạo điểm nhấn cho góc máy của bạn.', 1, 4.9, 41),
+    ('pc-cps-ultra-5-225f-rtx-5050', 'PC CPS Ultra 5 225F / 16GB / 512GB / RTX 5050', 'CPS', 'pc', 22990000, 25990000,
+     'img/pc4_png.webp', 0, '', '', 0, '', 'Lập trình', 'Intel Core Ultra 5 225F', '16GB', '512GB SSD', 'NVIDIA GeForce RTX 5050', 15,
+     'Cấu hình thế hệ mới với Intel Core Ultra 5 225F, card đồ họa GeForce RTX 5050, RAM 16GB, ổ lưu trữ 512GB và bo mạch chủ B860M.
+Dung lượng RAM và ổ cứng rộng rãi giúp làm việc đa nhiệm, lập trình, học tập và giải trí thoải mái hơn.', 0, 4.8, 22),
+    ('pc-cps-creator-ultra-ai-i9-14900k-rtx-5070-ti', 'PC CPS Creator Ultra AI i9 14900K / 64GB / 1TB / RTX 5070 Ti', 'CPS', 'pc', 85490000, 95000000,
+     'img/pc5_png.webp', 0, '', '', 0, '', 'Đồ họa', 'Intel Core i9 14900K', '64GB', '1TB SSD', 'NVIDIA GeForce RTX 5070 Ti', 5,
+     'Cấu hình cao cấp dành cho sáng tạo nội dung và đồ họa với Intel Core i9 14900K, card đồ họa GeForce RTX 5070 Ti, RAM 64GB, ổ lưu trữ 1TB và bo mạch chủ Z790.
+Thùng máy kính cong cùng quạt RGB tạo nên góc máy ấn tượng cho công việc dựng phim, thiết kế và giải trí.', 1, 5.0, 12),
     ('laptop-asus-vivobook-15-demo', 'Laptop ASUS Vivobook 15', 'ASUS', 'laptop', 13490000, NULL,
      'assets/images/home/laptop-asus.jpg', 15.6, 'Full HD', 'IPS', 60, '', 'Văn phòng', 'Intel Core i5', '16GB RAM', 'SSD 512GB', 'Intel Iris Xe', 10,
      'Sản phẩm mẫu cho trang chủ. Laptop màn hình 15.6 inch dành cho học tập và công việc hằng ngày. Giá và cấu hình là dữ liệu minh họa để bạn chỉnh sửa theo sản phẩm thực tế.', 0, 0, 0),

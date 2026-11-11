@@ -5,6 +5,6 @@
 // hoặc URL đầy đủ, ví dụ 'https://example.com/laptop/'.
 return [
     ['name' => 'Màn hình', 'category' => 'monitor', 'icon' => 'monitor', 'url' => 'monitor.php'],
-    ['name' => 'PC', 'category' => 'pc', 'icon' => 'tower', 'url' => ''],
+    ['name' => 'PC', 'category' => 'pc', 'icon' => 'tower', 'url' => 'pc.php'],
     ['name' => 'Laptop', 'category' => 'laptop', 'icon' => 'laptop', 'url' => ''],
 ];
