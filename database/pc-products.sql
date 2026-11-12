@@ -5,8 +5,8 @@
 -- Importing again keeps any edits you made (ON DUPLICATE KEY UPDATE slug = slug).
 USE cellphones_shop;
 
--- Remove the old placeholder PCs that used the pictures from assets/images/home.
-DELETE FROM products WHERE category = 'pc' AND slug LIKE 'pc-%-demo';
+-- Keep existing PCs, including edited demo products. This import only inserts
+-- missing products; remove unwanted demo rows explicitly in phpMyAdmin.
 
 INSERT INTO products
     (slug, name, brand, category, price, old_price, image, screen_size, resolution, panel,

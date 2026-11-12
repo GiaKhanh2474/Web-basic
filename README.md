@@ -1,5 +1,7 @@
 # Cửa hàng công nghệ lấy cảm hứng từ CellphoneS — PHP + MySQL
 
+Khi sao chép hoặc triển khai dự án, giữ cả tệp ẩn `.htaccess`: Apache cần tệp này để xử lý các URL `.html` và chặn truy cập thư mục nội bộ, SQL và Git. Báo cáo QA và cách chạy kiểm thử bổ sung nằm tại `tests/QA-REPORT.md`. Script `database/pc-products.sql` chỉ bổ sung sản phẩm còn thiếu, không tự xóa các PC mẫu đã được chỉnh sửa.
+
 Một website bán hàng bằng tiếng Việt với trang chủ, danh mục màn hình, trang chi tiết sản phẩm và giỏ hàng sử dụng Session.
 
 Trang chủ hiển thị ba hàng sản phẩm có thể cuộn ngang theo thứ tự: **Màn hình → Máy tính → Laptop**.
