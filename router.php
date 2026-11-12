@@ -1,7 +1,7 @@
 <?php
 // Router for PHP's local development server. Apache uses .htaccess instead.
 $path = str_replace('\\', '/', rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/'));
-if (preg_match('~(?:^|/)(?:config|database|includes|scripts|tests|storage)(?:/|$)|(?:^|/)\.|(?:README\.md|\.(?:sql|log|bak))$~i', $path)) {
+if (preg_match('~(?:^|/)(?:config|database|includes|scripts|tests|storage|deploy)(?:/|$)|(?:^|/)\.|(?:Dockerfile|\.(?:sql|log|bak|md|ya?ml))$~i', $path)) {
     http_response_code(403); echo 'Forbidden'; return true;
 }
 if ($path === '/man-hinh.html') { require __DIR__.'/monitor.php'; return true; }
