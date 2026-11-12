@@ -1,12 +1,12 @@
 Options -Indexes
 
-<FilesMatch "(?i)(^\.|\.(sql|log|bak)$|^README\.md$)">
+<FilesMatch "(?i)(^\.|\.(sql|log|bak|md|ya?ml)$|^Dockerfile$)">
     Require all denied
 </FilesMatch>
 
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule ^(?:config|database|includes|scripts|tests|storage|\.git)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:config|database|includes|scripts|tests|storage|deploy|\.git)(?:/|$) - [F,L,NC]
 RewriteRule ^man-hinh\.html$ monitor.php [L,QSA]
 RewriteRule ^gio-hang\.html$ cart.php [L,QSA]
 RewriteRule ^(man-hinh-[a-z0-9-]+)\.html$ product.php?slug=$1 [L,QSA]

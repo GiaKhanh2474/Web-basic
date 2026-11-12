@@ -1,0 +1,54 @@
+name: Docker storefront QA
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build PHP production image
+        run: docker build -t storefront-qa .
+      - name: Start isolated MySQL and storefront
+        run: |
+          docker network create storefront-qa
+          docker run -d --name mysql --network storefront-qa \
+            -e MYSQL_ROOT_PASSWORD=local-ci-only -e MYSQL_ROOT_HOST=% \
+            -e MYSQL_DATABASE=web_basic_qa_docker mysql:8.4
+          for attempt in $(seq 1 60); do
+            if docker exec mysql mysqladmin ping -h 127.0.0.1 -uroot -plocal-ci-only --silent; then break; fi
+            sleep 2
+          done
+          docker run -d --name storefront --network storefront-qa -p 8095:10000 \
+            -e APP_ENV=testing -e DB_HOST=mysql -e DB_PORT=3306 \
+            -e DB_DATABASE=web_basic_qa_docker -e DB_USERNAME=root \
+            -e DB_PASSWORD=local-ci-only -e DB_AUTO_SETUP=true storefront-qa
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8095/health.php; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8095/health.php
+      - name: Test real Apache container and MySQL
+        run: |
+          docker cp tests storefront:/var/www/html/tests
+          docker exec storefront php tests/smoke.php http://127.0.0.1:10000
+          docker exec storefront php tests/homepage.php http://127.0.0.1:10000 --check-migration
+          docker exec storefront php tests/regressions.php http://127.0.0.1:10000
+          docker exec storefront php tests/qa.php http://127.0.0.1:10000
+          docker exec storefront php tests/deploy.php http://127.0.0.1:10000
+          docker exec storefront php scripts/setup.php --existing-database
+          docker restart storefront
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8095/health.php; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8095/health.php
+      - name: Container logs
+        if: failure()
+        run: |
+          docker logs storefront || true
+          docker logs mysql || true
