@@ -25,3 +25,6 @@ Website bán laptop được xây dựng bằng ngôn ngữ PHP, MySQL, HTML, CS
 - Tìm kiếm và xem chi tiết sản phẩm.
 - Quản lý giỏ hàng.
 - Kiểm tra số lượng tồn kho.
+
+## 5. Lưu ý
+- Dự án được xây dựng nhằm mục đích học tập và thực hành lập trình PHP, lấy cảm hứng từ mô hình website thương mại điện tử bán laptop. Dự án không thuộc sở hữu, không đại diện và không có liên kết thương mại với CellphoneS.
