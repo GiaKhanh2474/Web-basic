@@ -1,91 +1,361 @@
 <?php
-require_once __DIR__.'/includes/home-catalog.php';
-require_once __DIR__.'/includes/cart.php';
-$activePage = 'home';
-$pageTitle = 'CellphoneS | Màn hình, máy tính & laptop cho góc máy của bạn';
-$pageDescription = 'Khám phá màn hình, máy tính và laptop. Tìm thiết bị phù hợp cho công việc, học tập và giải trí.';
-$searchAction = 'index.php';
-$query = is_string($_GET['q'] ?? null) ? trim($_GET['q']) : '';
-$homeCategories = shop_categories();
-$groupedProducts = array_fill_keys(array_keys($homeCategories), []);
-$homeError = false;
-try {
-    foreach (products($query !== '' ? ['q' => $query] : []) as $item) {
-        $type = category_from_product($item);
-        if (array_key_exists($type, $groupedProducts)) $groupedProducts[$type][] = $item;
-    }
-} catch (PDOException $exception) {
-    error_log($exception->getMessage());
-    $homeError = true;
-    http_response_code(503);
-}
-$heroMonitor = $groupedProducts['monitor'][0] ?? null;
-$heroComputer = $groupedProducts['pc'][0] ?? null;
-$heroLaptop = $groupedProducts['laptop'][0] ?? null;
-$extraStyles = ['assets/css/home.css'];
-$extraScripts = ['assets/js/home.js'];
-require __DIR__.'/includes/header.php';
-?>
-<main class="container home-page">
-    <?php if ($query === ''): ?>
-    <section class="home-welcome" aria-labelledby="home-title">
-        <div class="home-welcome-copy">
-            <span class="home-eyebrow"><span></span> CÔNG NGHỆ CHO CUỘC SỐNG</span>
-            <h1 id="home-title">Một điểm đến.<br><em>Trọn bộ góc máy.</em></h1>
-            <p>Từ màn hình đầu tiên đến góc máy mơ ước.<br>Khám phá thiết bị phù hợp với cách bạn làm việc và giải trí.</p>
-            <a class="button-primary" href="#man-hinh">Khám phá sản phẩm <?= icon('arrow') ?></a>
-        </div>
-        <div class="home-welcome-art" aria-hidden="true">
-            <span class="home-art-orbit orbit-one"></span><span class="home-art-orbit orbit-two"></span>
-            <span class="home-art-word">YOUR NEXT SETUP</span>
-            <img class="home-art-monitor" src="<?= e($heroMonitor ? product_image_url($heroMonitor) : url('assets/images/xiaomi-a27qi.webp')) ?>" alt="" width="340" height="300" fetchpriority="high">
-            <img class="home-art-pc" src="<?= e($heroComputer ? product_image_url($heroComputer) : url('assets/images/home/pc-dell.jpg')) ?>" alt="" width="210" height="250">
-            <img class="home-art-laptop" src="<?= e($heroLaptop ? product_image_url($heroLaptop) : url('assets/images/home/laptop-asus.jpg')) ?>" alt="" width="260" height="200">
-            <span class="home-art-caption"><?= icon('check') ?> Làm việc. Sáng tạo. Giải trí.</span>
-        </div>
-    </section>
-    <?php else: ?>
-    <div class="home-search-heading"><div><span class="home-eyebrow">TÌM THIẾT BỊ CỦA BẠN</span><h1 id="home-title">Kết quả cho “<?= e($query) ?>”</h1><p><?= array_sum(array_map('count', $groupedProducts)) ?> sản phẩm trong các danh mục</p></div><a href="<?= e(url('index.php')) ?>" class="text-link">Xóa tìm kiếm <?= icon('close') ?></a></div>
-    <?php endif; ?>
+// Kết nối cơ sở dữ liệu
+require_once __DIR__ . '/config.php';
 
-    <nav class="home-category-navigation" aria-label="Khám phá theo danh mục">
-        <?php foreach ($homeCategories as $type => $category): ?>
-        <a class="home-category-tile home-category-<?= e($type) ?>" href="<?= e(category_destination($type)) ?>">
-            <span class="home-category-symbol"><?= icon($category['icon']) ?></span>
-            <span class="home-category-text"><strong><?= e($category['label']) ?></strong><small><?= e(['monitor' => 'Sắc nét mọi góc nhìn', 'pc' => 'Hiệu năng cho mọi tác vụ', 'laptop' => 'Linh hoạt ở mọi nơi'][$type]) ?></small></span>
-            <?= icon('arrow') ?>
+// Lấy từ khóa tìm kiếm
+$keyword = trim($_GET['search'] ?? '');
+
+// Lấy thương hiệu được chọn
+$brand = trim($_GET['brand'] ?? '');
+
+try {
+    // Lấy danh sách thương hiệu
+    $brandQuery = $conn->query(
+        "SELECT DISTINCT brand
+         FROM laptopstore
+         WHERE brand IS NOT NULL AND brand != ''
+         ORDER BY brand ASC"
+    );
+
+    $brands = $brandQuery->fetchAll(PDO::FETCH_COLUMN);
+
+    // Truy vấn sản phẩm
+    $sql = "SELECT * FROM laptopstore WHERE 1=1";
+    $params = [];
+
+    if ($keyword !== '') {
+        $sql .= " AND (name LIKE :keyword OR brand LIKE :keyword)";
+        $params[':keyword'] = "%$keyword%";
+    }
+
+    if ($brand !== '') {
+        $sql .= " AND brand = :brand";
+        $params[':brand'] = $brand;
+    }
+
+    $sql .= " ORDER BY id DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
+
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Lỗi truy vấn dữ liệu: " . $e->getMessage());
+}
+
+// Hàm xử lý hình ảnh
+function getProductImage($image) {
+    if (empty($image)) {
+        return '';
+    }
+
+    // Nếu là đường dẫn ảnh trực tuyến
+    if (preg_match('/^https?:\/\//i', $image)) {
+        return $image;
+    }
+
+    // Nếu đã có đường dẫn assets/images
+    if (strpos($image, 'assets/images/') === 0) {
+        return $image;
+    }
+
+    // Nếu chỉ có tên file ảnh
+    return 'assets/images/' . $image;
+}
+
+// Hàm bảo vệ dữ liệu hiển thị
+function e($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+}
+?>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CellphoneS - Laptop chính hãng</title>
+    <link rel="stylesheet" href="assets/index_style.css">
+    <link rel="stylesheet" href="assets/header_style.css">
+    <link rel="stylesheet" href="assets/footer_style.css">
+</head>
+
+<body>
+<!-- HEADER -->
+<div class="top-banner">
+    <div>Sản phẩm chính hãng <span>·</span> An tâm lựa chọn</div> 
+    <div>Nâng tầm góc máy <span>·</span> Trọn vẹn trải nghiệm</div>
+    <div>Màn hình tốt <span>·</span> Giá thật hời</div>
+</div>
+
+<header class="header">
+    <div class="header-container">
+
+        <a href="index.php" class="logo">
+            cellphones<span>S</span>
         </a>
-        <?php endforeach; ?>
+
+        <button type="button" class="header-button category-button">
+            <span class="menu-icon">☷</span>
+            Danh mục
+            <span>⌄</span>
+        </button>
+
+        <form action="index.php" method="GET" class="search-box">
+            <input
+                type="text"
+                name="search"
+                placeholder="Bạn cần tìm sản phẩm gì?"
+                value="<?= e($keyword ?? '') ?>"
+            >
+            <button type="submit">⌕</button>
+        </form>
+
+        <a href="#" class="header-action">
+            <span>Góc làm việc<br>của bạn</span>
+        </a>
+
+        <a href="#" class="header-action">
+            <span>Sản phẩm<br>yêu thích</span>
+        </a>
+
+        <a href="cart.php" class="header-action cart-button">
+            <span>Giỏ hàng</span>
+        </a>
+    </div>
+</header>
+
+<!-- NOI DUNG CHINH -->
+<main class="container">
+
+    <div class="breadcrumb">
+        Trang chủ / Laptop
+    </div>
+
+    <!-- DANH MUC -->
+    <nav class="category-menu">
+        <a href="index.php" class="active">Laptop</a>
+        <a href="#">PC</a>
+        <a href="#">Màn hình</a>
     </nav>
 
-    <?php if ($homeError): ?>
-    <div class="empty-state"><?= icon('box') ?><h2>Chưa thể tải sản phẩm</h2><p>Vui lòng kiểm tra kết nối MySQL và chạy phần cập nhật database theo README.</p><a href="<?= e(url('index.php')) ?>" class="button-primary">Thử lại</a></div>
-    <?php else: ?>
-    <?php foreach ($homeCategories as $type => $category):
-        $sectionProducts = $groupedProducts[$type];
-        $destination = category_destination($type);
-        $localSection = url('index.php#'.$category['anchor']);
-    ?>
-    <section class="home-section home-section-<?= e($type) ?>" id="<?= e($category['anchor']) ?>" data-product-section aria-labelledby="title-<?= e($type) ?>">
-        <div class="home-section-heading">
-            <div class="home-section-title"><span class="home-section-symbol"><?= icon($category['icon']) ?></span><div><div class="home-section-title-line"><h2 id="title-<?= e($type) ?>"><?= e($category['label']) ?></h2><span><?= count($sectionProducts) ?> sản phẩm</span></div><p><?= e(['monitor' => 'Thêm không gian, thêm cảm hứng.', 'pc' => 'Sẵn sàng cho công việc và những trận game.', 'laptop' => 'Mang cả thế giới công nghệ theo bạn.'][$type]) ?></p></div></div>
-            <div class="home-section-actions">
-                <?php if ($destination !== $localSection): ?><a class="home-view-all" href="<?= e($destination) ?>">Xem tất cả <?= icon('arrow') ?></a><?php endif; ?>
-                <?php if ($sectionProducts): ?><div class="home-scroll-buttons"><button type="button" data-scroll-prev aria-controls="products-<?= e($type) ?>" aria-label="Xem sản phẩm <?= e($category['label']) ?> phía trước" disabled><?= icon('back') ?></button><button type="button" data-scroll-next aria-controls="products-<?= e($type) ?>" aria-label="Xem sản phẩm <?= e($category['label']) ?> tiếp theo" disabled><?= icon('arrow') ?></button></div><?php endif; ?>
+    <!-- BANNER -->
+    <div class="banner-area">
+        <div class="banner banner-one">
+            <h2>DEAL LAPTOP SIÊU HỜI</h2>
+            <p>Laptop chính hãng - Giá cực tốt</p>
+            <p>Ưu đãi hấp dẫn mỗi ngày!</p>
+        </div>
+
+        <div class="banner banner-two">
+            <h2>LAPTOP GAMING</h2>
+            <p>Hiệu năng mạnh mẽ - Chiến game cực đỉnh</p>
+            <p>Khám phá ngay hôm nay!</p>
+        </div>
+    </div>
+
+    <!-- THUONG HIEU -->
+    <section class="section">
+        <h2 class="section-title">Máy tính laptop</h2>
+
+        <div class="brand-list">
+
+            <a href="index.php" class="brand-item">
+                Tất cả
+            </a>
+
+            <?php foreach ($brands as $item): ?>
+                <a
+                    href="index.php?brand=<?= urlencode($item) ?>"
+                    class="brand-item <?= $brand === $item ? 'selected' : '' ?>"
+                >
+                    <?= e($item) ?>
+                </a>
+            <?php endforeach; ?>
+
+        </div>
+    </section>
+
+    <!-- UU DAI -->
+    <section class="section">
+        <h3 class="section-title">Ưu đãi & voucher</h3>
+
+        <div class="voucher-list">
+            <div class="voucher">
+                <strong>GIẢM ĐẾN 5 TRIỆU</strong>
+                <p>Ưu đãi mua laptop chính hãng.</p>
+            </div>
+
+            <div class="voucher">
+                <strong>GIẢM ĐẾN 3 TRIỆU</strong>
+                <p>Ưu đãi dành cho học sinh, sinh viên.</p>
+            </div>
+
+            <div class="voucher">
+                <strong>ƯU ĐÃI ĐẶC BIỆT</strong>
+                <p>Khuyến mãi mua laptop hôm nay.</p>
+            </div>
+
+            <div class="voucher">
+                <strong>TRẢ GÓP 0%</strong>
+                <p>Mua laptop dễ dàng, tiết kiệm.</p>
             </div>
         </div>
-        <?php if ($sectionProducts): ?>
-        <div class="home-product-track" id="products-<?= e($type) ?>" tabindex="0" aria-label="Sản phẩm <?= e($category['label']) ?>; dùng phím mũi tên để cuộn">
-            <?php foreach ($sectionProducts as $product) require __DIR__.'/includes/product-card.php'; ?>
-        </div>
-        <div class="home-section-bottom"><span><?= icon('arrow') ?> Lướt ngang để khám phá thêm</span><span data-scroll-position aria-live="polite" aria-atomic="true"><?= count($sectionProducts) ?> sản phẩm</span></div>
-        <?php else: ?>
-        <div class="home-empty-category"><?= icon($category['icon']) ?><p><?= $query !== '' ? 'Chưa có sản phẩm phù hợp với từ khóa này.' : 'Danh mục chưa có sản phẩm.' ?></p><?php if ($query !== ''): ?><a href="<?= e(url('index.php#'.$category['anchor'])) ?>">Xem các sản phẩm khác <?= icon('arrow') ?></a><?php endif; ?></div>
-        <?php endif; ?>
     </section>
-    <?php endforeach; ?>
-    <?php endif; ?>
 
-    <div class="home-closing-note"><span><?= icon('monitor') ?><?= icon('tower') ?><?= icon('laptop') ?></span><p>Góc máy của bạn.<strong> Theo cách của bạn.</strong></p><a href="#home-title" aria-label="Lên đầu trang"><?= icon('arrow') ?></a></div>
+    <!-- CHON THEO NHU CAU -->
+    <section class="section">
+        <h2 class="section-title">Chọn theo nhu cầu</h2>
+
+        <div class="demand-list">
+
+            <a href="index.php?search=Văn phòng" class="demand-item">
+                Văn phòng
+            </a>
+
+            <a href="index.php?search=Gaming" class="demand-item">
+                Gaming
+            </a>
+
+            <a href="index.php?search=MacBook" class="demand-item">
+                Mỏng nhẹ
+            </a>
+
+            <a href="index.php?search=Gaming" class="demand-item">
+                Đồ họa - Kỹ thuật
+            </a>
+
+            <a href="index.php?search=Lenovo" class="demand-item">
+                Sinh viên
+            </a>
+
+            <a href="index.php?search=HP" class="demand-item">
+                Cảm ứng
+            </a>
+
+            <a href="index.php?search=AI" class="demand-item">
+                Laptop AI
+            </a>
+
+        </div>
+    </section>
+
+    <!-- DANH SACH SAN PHAM -->
+    <section class="section">
+
+        <div class="product-header">
+
+            <div>
+                <h2 class="section-title">
+                    <?= $keyword !== '' ? 'Kết quả tìm kiếm' : 'Laptop nổi bật' ?>
+                </h2>
+
+                <p class="product-count">
+                    Tìm thấy <?= count($products) ?> sản phẩm
+                    <?= $brand !== '' ? ' - Thương hiệu: ' . e($brand) : '' ?>
+                </p>
+            </div>
+
+        </div>
+
+        <div class="product-grid">
+
+            <?php if (count($products) > 0): ?>
+
+                <?php foreach ($products as $product): ?>
+
+                    <div class="product-card">
+
+                        <a href="product_detail.php?id=<?= (int)($product['Id'] ?? 0) ?>">
+
+                        <div class="product-image">
+                            <?php
+                            $imagePath = getProductImage($product['image'] ?? '');
+                            ?>
+                            <style>
+                                .product-image {
+                                    width: 100%;
+                                    height: 190px;
+                                    object-fit: contain;
+                                    display: block;
+                                    margin: 0 auto;
+                                }
+                            </style>
+
+                            <?php if ($imagePath !== ''): ?>
+                            <img
+                            src="<?= e($imagePath) ?>"
+                            alt="<?= e($product['name']) ?>"
+                            class="product-image"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                            >
+                            <img 
+                            src="<?= htmlspecialchars($product['image']) ?>"
+                            alt="<?= htmlspecialchars($product['name']) ?>"
+                            class="product-image"
+                            >
+                            <span class="no-image" style="display:none;">💻</span>
+                            <?php else: ?>
+                                <span class="no-image">💻</span>
+                                <?php endif; ?>
+                        </div>
+
+
+                            <h3 class="product-name">
+                                <?= e($product['name']) ?>
+                            </h3>
+
+                        </a>
+
+                        <p class="product-brand">
+                            Thương hiệu: <?= e($product['brand']) ?>
+                        </p>
+
+                        <p class="product-price">
+                            <?= number_format((float)$product['price'], 0, ',', '.') ?>đ
+                        </p>
+
+                        <p class="product-stock">
+                            Còn hàng: <?= (int)$product['quantity'] ?>
+                        </p>
+
+                        <a
+                        href="product_detail.php?id=<?= (int)$product['Id'] ?>"
+                        class="detail-button">
+                            Xem chi tiết
+                        </a>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            <?php else: ?>
+
+                <div class="empty-message">
+                    <h3>Không tìm thấy sản phẩm!</h3>
+                    <p>Vui lòng thử từ khóa hoặc thương hiệu khác.</p>
+                    <br>
+                    <a href="index.php" class="detail-button">
+                        Quay lại trang chủ
+                    </a>
+                </div>
+
+            <?php endif; ?>
+
+        </div>
+
+    </section>
+
 </main>
-<?php require __DIR__.'/includes/footer.php'; ?>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <h2>CELLPHONES</h2>
+    <p>Hệ thống bán laptop chính hãng</p>
+    <p>© 2026 CellphoneS - Website bán laptop</p>
+</footer>
+
+</body>
+</html>
