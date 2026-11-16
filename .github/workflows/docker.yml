@@ -38,6 +38,7 @@ jobs:
           docker exec storefront php tests/smoke.php http://127.0.0.1:10000
           docker exec storefront php tests/homepage.php http://127.0.0.1:10000 --check-migration
           docker exec storefront php tests/regressions.php http://127.0.0.1:10000
+          docker exec storefront php tests/laptop.php http://127.0.0.1:10000
           docker exec storefront php tests/qa.php http://127.0.0.1:10000
           docker exec storefront php tests/deploy.php http://127.0.0.1:10000
           docker exec storefront php scripts/setup.php --existing-database

@@ -6,5 +6,5 @@
 return [
     ['name' => 'Màn hình', 'category' => 'monitor', 'icon' => 'monitor', 'url' => 'monitor.php'],
     ['name' => 'PC', 'category' => 'pc', 'icon' => 'tower', 'url' => 'pc.php'],
-    ['name' => 'Laptop', 'category' => 'laptop', 'icon' => 'laptop', 'url' => ''],
+    ['name' => 'Laptop', 'category' => 'laptop', 'icon' => 'laptop', 'url' => 'laptop.php'],
 ];

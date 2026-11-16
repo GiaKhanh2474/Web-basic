@@ -138,17 +138,13 @@ URL đầy đủ sẽ chuyển hướng đến website tương ứng.
 
 Đường dẫn tương đối được tính từ thư mục dự án hiện tại.
 
-Hiện tại, URL của PC và Laptop được để trống (`''`) để cấu hình sau.
-
-Trong menu đầu trang, mỗi mục chỉ hiển thị tên và biểu tượng.
-
-Các liên kết tắt trên trang chủ và chân trang tạm thời dẫn đến hàng sản phẩm tương ứng trên trang chủ.
+Hiện tại, các danh mục trỏ đến `monitor.php`, `pc.php` và `laptop.php`. Menu đầu trang, các liên kết trên trang chủ và chân trang dùng chung cấu hình này.
 
 Khi điền URL, các liên kết danh mục sẽ sử dụng URL mới.
 
 Các thẻ sản phẩm vẫn mở trang chi tiết chung tại `product.php`.
 
-Không có website danh mục PC/Laptop riêng nào được tạo thêm.
+Trang Laptop dùng chung database `products`, trang chi tiết và giỏ hàng với các danh mục khác. Ảnh laptop dùng lại thư mục `assets/images/home/`, không cần bản sao `image_laptop/`.
 
 ## Hoạt động của giỏ hàng
 
@@ -198,6 +194,8 @@ Các mã trạng thái lỗi:
 |---|---|
 | `index.php` | Trang chủ với ba hàng danh mục có thể cuộn ngang và chức năng tìm kiếm toàn bộ sản phẩm |
 | `monitor.php` | Danh mục màn hình và bộ lọc |
+| `pc.php` | Danh mục máy tính để bàn |
+| `laptop.php` | Danh mục laptop; lọc thương hiệu, CPU, RAM, ổ cứng, kích thước và giá |
 | `product.php` | Trang chi tiết sản phẩm lấy dữ liệu từ cơ sở dữ liệu |
 | `cart.php` | Giỏ hàng |
 | `includes/` | Các thành phần giao diện, danh mục và hàm hỗ trợ Session dùng chung |
@@ -229,7 +227,7 @@ Những sản phẩm tạm thời được thêm vào trong quá trình kiểm t
 
 Các bài kiểm thử giỏ hàng sử dụng Session riêng.
 
-Chạy các lệnh sau:
+Chạy các lệnh sau. Riêng `tests/laptop.php` chỉ cho phép database thử nghiệm có tên bắt đầu bằng `web_basic_qa_`; đặt `DB_DATABASE` cho cả server và tiến trình kiểm thử, rồi khởi tạo database đó trước khi chạy. GitHub Actions tự tạo database thử nghiệm riêng.
 
 ```powershell
 & 'C:\xampp\php\php.exe' 'C:\xampp\htdocs\cellphones-shop\tests\smoke.php' 'http://localhost/cellphones-shop/'
@@ -237,6 +235,8 @@ Chạy các lệnh sau:
 & 'C:\xampp\php\php.exe' 'C:\xampp\htdocs\cellphones-shop\tests\homepage.php' 'http://localhost/cellphones-shop/'
 
 & 'C:\xampp\php\php.exe' 'C:\xampp\htdocs\cellphones-shop\tests\regressions.php' 'http://localhost/cellphones-shop/'
+
+& 'C:\xampp\php\php.exe' 'C:\xampp\htdocs\cellphones-shop\tests\laptop.php' 'http://localhost/cellphones-shop/'
 
 & 'C:\xampp\php\php.exe' 'C:\xampp\htdocs\cellphones-shop\scripts\verify-assets.php' 'http://localhost/cellphones-shop/'
 ```
