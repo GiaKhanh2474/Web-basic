@@ -1,14 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/database.php';
-
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_name('cellphones_shop_session');
     session_start([
         'cookie_httponly' => true,
         'cookie_samesite' => 'Lax',
-        'cookie_secure' => getenv('APP_ENV') === 'production' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'cookie_secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
         'use_strict_mode' => true,
     ]);
 }
@@ -17,7 +15,13 @@ function db(): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $pdo = connect_database();
+        $config = require dirname(__DIR__) . '/config/database.php';
+        $pdo = new PDO(
+            "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']};charset=utf8mb4",
+            $config['username'],
+            $config['password'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false]
+        );
     }
     return $pdo;
 }
@@ -39,7 +43,7 @@ function url(string $path = ''): string
     if ($documentRoot !== '' && str_starts_with(strtolower($root . '/'), strtolower($documentRoot . '/'))) {
         $base = substr($root, strlen($documentRoot));
     } else {
-        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/cellphones-shop/monitor.php');
+        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/cellphones-shop/laptop.php');
         $base = preg_replace('~/(?:api/)?[^/]+\.php$~', '', $script) ?: '';
     }
     return rtrim($base, '/') . '/' . ltrim($path, '/');
