@@ -79,7 +79,15 @@
     const saved = JSON.parse(localStorage.getItem(favoriteKey) || '[]');
     if (Array.isArray(saved)) favorites = saved.filter(item => item && Number.isInteger(Number(item.id)) && typeof item.name === 'string' && typeof item.href === 'string' && typeof item.image === 'string' && typeof item.price === 'string');
   } catch (_) { favorites = []; }
-  function safeLocalUrl(value) { try { const target = new URL(value, window.location.href); return target.origin === location.origin && ['http:', 'https:'].includes(target.protocol) ? target.href : appUrl('laptop.php'); } catch (_) { return appUrl('laptop.php'); } }
+  function safeLocalUrl(value) { try { const target = new URL(value, window.location.href); return target.origin === location.origin && ['http:', 'https:'].includes(target.protocol) ? target.href : appUrl('monitor.php'); } catch (_) { return appUrl('monitor.php'); } }
+  function safeImageUrl(value) {
+    const fallback = appUrl('assets/images/xiaomi-a27qi.webp');
+    if (typeof value !== 'string' || !value.trim()) return fallback;
+    try {
+      const target = new URL(value, window.location.href);
+      return ['http:', 'https:'].includes(target.protocol) ? target.href : fallback;
+    } catch (_) { return fallback; }
+  }
   function saveFavorites() {
     try { localStorage.setItem(favoriteKey, JSON.stringify(favorites)); } catch (_) { /* Favorites still work for the current page. */ }
     document.querySelectorAll('[data-favorite]').forEach(button => {
@@ -105,7 +113,7 @@
     favorites.forEach(item => {
       const row = document.createElement('div'); row.className = 'favorite-item';
       const imageLink = document.createElement('a'); imageLink.href = safeLocalUrl(item.href);
-      const img = document.createElement('img'); img.src = safeLocalUrl(item.image); img.alt = item.name; imageLink.append(img);
+      const img = document.createElement('img'); img.src = safeImageUrl(item.image); img.alt = item.name; imageLink.append(img);
       const info = document.createElement('div'); const link = document.createElement('a'); link.href = safeLocalUrl(item.href);
       const name = document.createElement('h3'); name.textContent = item.name; link.append(name);
       const price = document.createElement('strong'); price.textContent = item.price; info.append(link, price);

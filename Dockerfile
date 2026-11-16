@@ -22,7 +22,7 @@ COPY database/ ./database/
 COPY img/ ./img/
 COPY includes/ ./includes/
 COPY scripts/setup.php scripts/setup-homepage.php ./scripts/
-COPY .htaccess index.php monitor.php pc.php product.php cart.php health.php ./
+COPY .htaccess index.php monitor.php pc.php laptop.php product.php cart.php health.php ./
 
 ENV PORT=10000
 EXPOSE 10000

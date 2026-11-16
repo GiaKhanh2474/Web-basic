@@ -66,7 +66,7 @@ function category_destination(string $category): string
         if (preg_match('~^https?://~i', $destination) || str_starts_with($destination, '/')) return $destination;
         return url($destination);
     }
-    return $category === 'monitor' ? url('laptop.php') : url('index.php#' . $definitions[$category]['anchor']);
+    return $category === 'monitor' ? url('monitor.php') : url('index.php#' . $definitions[$category]['anchor']);
 }
 
 function product_image_url(array $product): string

@@ -55,7 +55,7 @@ $breadcrumbCategoryMeta = shop_categories()[$breadcrumbCategory] ?? shop_categor
             <input type="search" name="q" value="<?= e(is_string($_GET['q'] ?? null) ? $_GET['q'] : '') ?>" placeholder="Bạn cần tìm sản phẩm gì?" aria-label="Tìm sản phẩm">
             <kbd>⌕</kbd>
         </form>
-        <a class="header-link desktop-link" href="<?= e(url('laptop.php?use=Văn phòng')) ?>"><?= icon('monitor') ?><span>Góc làm việc<br><strong>của bạn</strong></span></a>
+        <a class="header-link desktop-link" href="<?= e(url('monitor.php?use=Văn phòng')) ?>"><?= icon('monitor') ?><span>Góc làm việc<br><strong>của bạn</strong></span></a>
         <button class="header-link favorite-header" type="button" data-show-favorites aria-label="Sản phẩm yêu thích"><?= icon('heart') ?><span>Sản phẩm<br><strong>yêu thích</strong></span></button>
         <a class="header-cart <?= $activePage === 'cart' ? 'current' : '' ?>" href="<?= e(url('cart.php')) ?>" aria-label="Giỏ hàng"><span class="cart-icon"><?= icon('bag') ?><b data-cart-count><?= cart_count() ?></b></span><span>Giỏ hàng</span></a>
     </div>

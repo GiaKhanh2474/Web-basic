@@ -4,6 +4,12 @@ $computerCategory = shop_categories()[$breadcrumbCategory];
 $computerSpecs = product_specs($product);
 $computerChips = product_chips($product);
 $computerDestination = category_destination($breadcrumbCategory);
+$computerDisplay = [];
+if ((float) ($product['screen_size'] ?? 0) > 0) $computerDisplay[] = (string) (float) $product['screen_size'] . ' inch';
+if (trim((string) ($product['resolution'] ?? '')) !== '') $computerDisplay[] = trim((string) $product['resolution']);
+$computerOffer = $breadcrumbCategory === 'laptop' && $computerDisplay
+    ? 'Màn hình ' . implode(', ', $computerDisplay) . '.'
+    : (trim((string) ($product['gpu'] ?? '')) !== '' ? 'Đồ họa ' . $product['gpu'] . '.' : 'Khám phá các thông số kỹ thuật bên dưới.');
 ?>
 <main class="container detail-page product-computer-detail">
     <div class="detail-heading"><h1><?= e($product['name']) ?> <span><?= e(implode(' / ', $computerChips)) ?></span></h1><div class="detail-meta"><span>Thương hiệu: <strong><?= e($product['brand']) ?></strong></span><span class="meta-divider"></span><a href="<?= e($computerDestination) ?>"><?= e($computerCategory['label']) ?></a><a href="#specifications"><?= icon('sliders') ?> Thông số kỹ thuật</a></div></div>
@@ -17,7 +23,7 @@ $computerDestination = category_destination($breadcrumbCategory);
             <div class="stock-label"><i></i><?= (int)$product['stock'] > 0 ? 'Sẵn hàng' : 'Tạm hết hàng' ?><span>SKU: <?= $breadcrumbCategory === 'pc' ? 'PC' : 'LT' ?>-<?= str_pad((string)$product['id'], 4, '0', STR_PAD_LEFT) ?></span></div>
             <div class="purchase-price"><span>Giá sản phẩm</span><div><strong><?= money($product['price']) ?></strong><?php if ($discount): ?><del><?= money($product['old_price']) ?></del><b>-<?= $discount ?>%</b><?php endif; ?></div><p>Giá niêm yết cho 1 sản phẩm</p></div>
             <div class="variant-label"><strong>Cấu hình sản phẩm</strong><span><?= e($product['brand']) ?></span></div><div class="selected-variant"><?= icon('check') ?><div><strong><?= e($product['cpu']) ?> · <?= e($product['ram']) ?></strong><span><?= e($product['storage']) ?> · <?= e($product['gpu']) ?></span></div></div>
-            <div class="offer-box"><h3><?= icon('cpu') ?> Cấu hình trong tầm tay</h3><ul><li><span>1</span>Bộ xử lý <?= e($product['cpu']) ?>.</li><li><span>2</span>Bộ nhớ <?= e($product['ram']) ?>, lưu trữ <?= e($product['storage']) ?>.</li><li><span>3</span><?= $breadcrumbCategory === 'laptop' ? 'Màn hình '.e((float)$product['screen_size']).' inch, '.e($product['resolution']).'.' : 'Đồ họa '.e($product['gpu']).'.' ?></li></ul></div>
+            <div class="offer-box"><h3><?= icon('cpu') ?> Cấu hình trong tầm tay</h3><ul><li><span>1</span>Bộ xử lý <?= e($product['cpu']) ?>.</li><li><span>2</span>Bộ nhớ <?= e($product['ram']) ?>, lưu trữ <?= e($product['storage']) ?>.</li><li><span>3</span><?= e($computerOffer) ?></li></ul></div>
             <div class="purchase-quantity"><label for="product-quantity">Số lượng</label><div class="quantity-control"><button type="button" data-step="-1" data-target="product-quantity" aria-label="Giảm số lượng"><?= icon('minus') ?></button><input id="product-quantity" type="number" min="1" max="<?= min(99, max(1, (int)$product['stock'])) ?>" value="1" aria-label="Số lượng sản phẩm"><button type="button" data-step="1" data-target="product-quantity" aria-label="Tăng số lượng"><?= icon('plus') ?></button></div><span><?= (int)$product['stock'] ?> sản phẩm có sẵn</span></div>
             <button class="button-primary add-main" type="button" data-add-cart="<?= (int)$product['id'] ?>" data-quantity-input="product-quantity" <?= (int)$product['stock'] < 1 ? 'disabled' : '' ?>><?= icon('cart') ?><span><strong>THÊM VÀO GIỎ HÀNG</strong><small>Lưu lựa chọn yêu thích của bạn</small></span></button>
             <a class="button-outline view-cart-button" href="<?= e(url('cart.php')) ?>">Xem giỏ hàng <?= icon('arrow') ?></a><div class="cart-reassurance"><?= icon('shield') ?> Thoải mái chọn lựa, chưa cần thanh toán.</div>

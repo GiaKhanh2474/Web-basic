@@ -32,8 +32,16 @@ function products(array $filters = []): array
     foreach (['ram' => 'ram', 'storage' => 'storage'] as $key => $column) {
         $value = trim((string) ($filters[$key] ?? ''));
         if ($value !== '') {
-            $where[] = $column . ' LIKE ?';
-            $params[] = addcslashes($value, '%_\\') . '%';
+            if (preg_match('/^(\d+(?:\.\d+)?)\s*(GB|TB)$/i', $value, $capacity)) {
+                // Match a complete capacity anywhere: SSD 512GB, 512 GB SSD,
+                // RAM 16GB. Do not match 16GB against 160GB or 512GB against 1512GB.
+                $where[] = $column . ' REGEXP ?';
+                $params[] = '(^|[^0-9.])' . preg_quote($capacity[1], '/')
+                    . '[[:space:]]*' . strtoupper($capacity[2]) . '([^[:alnum:]]|$)';
+            } else {
+                $where[] = $column . ' LIKE ?';
+                $params[] = '%' . addcslashes($value, '%_\\') . '%';
+            }
         }
     }
     switch ($filters['price'] ?? '') {

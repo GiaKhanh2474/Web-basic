@@ -17,7 +17,7 @@ try {
     $allProducts = products(array_merge($filters, ['category' => 'laptop']));
     $allBrands = brands('laptop');
     $heroProduct = product_by_slug('laptop-asus-vivobook-15-demo') ?? ($allProducts[0] ?? null);
-} catch (PDOException $exception) {
+} catch (RuntimeException $exception) {
     error_log($exception->getMessage());
     $allProducts = [];
     $allBrands = ['Acer', 'ASUS', 'Dell', 'HP', 'Lenovo'];
@@ -77,7 +77,7 @@ require __DIR__ . '/includes/header.php';
                 <span class="hero-dots"><i class="active"></i><i></i><i></i></span>
                 <span>LINH HOẠT MỌI NƠI · SẴN SÀNG MỌI Ý TƯỞNG</span>
             </div>
-            </a>
+        </a>
         <div class="side-promos">
             <a class="promo promo-gaming" href="<?= e(url('laptop.php?use=Gaming#catalog')) ?>">
                 <div>
@@ -101,7 +101,7 @@ require __DIR__ . '/includes/header.php';
 
     <section class="discovery-section" aria-labelledby="brand-heading">
         <div class="section-label">
-            <h2>Thương hiệu nổi bật</h2>
+            <h2 id="brand-heading">Thương hiệu nổi bật</h2>
             <span>Lựa chọn chiếc laptop từ thương hiệu bạn yêu thích</span>
         </div>
         <div class="brand-list">
@@ -160,7 +160,7 @@ require __DIR__ . '/includes/header.php';
                 <noscript><button type="submit" class="button-primary">Áp dụng</button></noscript>
                 <?php if ($filters): ?><a class="clear-filters" href="<?= e(url('laptop.php#catalog')) ?>">Xóa bộ lọc <?= icon('close') ?></a><?php endif; ?>
             </div>
-            </form>
+        </form>
 
         <div class="sort-row">
             <span>Sắp xếp theo:</span>
@@ -179,14 +179,14 @@ require __DIR__ . '/includes/header.php';
             <div class="empty-state">
                 <?= icon('box') ?>
                 <h3>Danh mục đang được chuẩn bị</h3>
-                <p>Chưa kết nối được cơ sở dữ liệu. Bạn hãy khởi động MySQL trong XAMPP và kiểm tra cấu hình trong <code>config/database.php</code>.</p>
+                <p>Chưa thể tải sản phẩm. Vui lòng thử lại sau.</p>
                 <a class="button-primary" href="<?= e(url('laptop.php')) ?>">Thử lại</a>
             </div>
         <?php elseif (!$allProducts): ?>
             <div class="empty-state">
                 <?= icon('search') ?>
                 <h3>Chưa tìm thấy laptop phù hợp</h3>
-                <p>Thử từ khóa khác hoặc bỏ bớt bộ lọc. Danh mục laptop hiện lấy dữ liệu có <code>category = 'laptop'</code> trong bảng <code>products</code>.</p>
+                <p>Thử một từ khóa khác hoặc bỏ bớt bộ lọc để có thêm lựa chọn.</p>
                 <a class="button-primary" href="<?= e(url('laptop.php#catalog')) ?>">Xem tất cả laptop</a>
             </div>
         <?php else: ?>
